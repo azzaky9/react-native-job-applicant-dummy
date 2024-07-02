@@ -14,6 +14,7 @@ const Header = (props: HeaderProps): React.ReactElement => (
 type FooterProps = {
   onAccept: () => void;
   onCancel: () => void;
+  isApplied: boolean;
 };
 
 const Footer = (props: ViewProps & FooterProps): React.ReactElement => (
@@ -26,8 +27,10 @@ const Footer = (props: ViewProps & FooterProps): React.ReactElement => (
       style={styles.footerControl}
       size='small'
       onPress={props.onAccept}
+      appearance={props.isApplied ? "outline" : "filled"}
+      status={props.isApplied ? "danger" : "primary"}
     >
-      APPLY
+      {props.isApplied ? "Cancel Applied" : "Apply"}
     </Button>
   </View>
 );

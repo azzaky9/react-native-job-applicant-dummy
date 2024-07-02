@@ -1,8 +1,10 @@
 import { useAuth } from "@/context/Auth";
 import { Button, Datepicker, Input, Layout } from "@ui-kitten/components";
-import React from "react";
-import { Text, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, View, ToastAndroid } from "react-native";
 import { StyleSheet } from "react-native";
+import { db } from "@/config/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const styles = StyleSheet.create({
   container: {
@@ -18,10 +20,76 @@ const styles = StyleSheet.create({
   }
 });
 
+type Profile = {
+  fullname: string;
+  age: number;
+  lamaBekerja: number;
+  jenisKelamin: string;
+  jenjangPendidikan: string;
+};
+
 export default function Profile() {
   const auth = useAuth();
 
   const [isEditMode, setIsEditMode] = React.useState(false);
+
+  const [data, setData] = useState<Profile>({
+    age: 0,
+    jenisKelamin: "",
+    jenjangPendidikan: "",
+    lamaBekerja: 0,
+    fullname: ""
+  });
+
+  const updateData = (key: keyof Profile, value: any) => {
+    setData({
+      ...data,
+      [key]: value
+    });
+  };
+
+  const onSubmit = async () => {
+    try {
+      if (auth.user) {
+        await setDoc(doc(db, "profile", auth.user.id), data);
+        ToastAndroid.show("Profile updated.", ToastAndroid.SHORT);
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(e);
+        console.log(e.message);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (auth.user) {
+          const docRef = doc(db, "profile", auth.user.id);
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            setData({
+              age: data.age,
+              jenisKelamin: data.jenisKelamin,
+              jenjangPendidikan: data.jenjangPendidikan,
+              lamaBekerja: data.lamaBekerja,
+              fullname: data.fullname
+            });
+          }
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          console.log(e);
+          console.log(e.message);
+        }
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <View
@@ -32,7 +100,7 @@ export default function Profile() {
       <View style={{ flex: 1, paddingLeft: 18, paddingRight: 18 }}>
         <Text
           style={{
-            marginTop: 50,
+            marginTop: 6,
             fontSize: 25,
             fontWeight: 600,
             textTransform: "capitalize"
@@ -66,38 +134,53 @@ export default function Profile() {
             Edit Profile
           </Text>
           <Input
-            placeholder='Username'
+            placeholder='Full Name'
             disabled={!isEditMode}
+            value={data.fullname}
+            onChangeText={(value) => {
+              updateData("fullname", value);
+            }}
             // value={value}
             // onChangeText={(nextValue) => setValue(nextValue)}
           />
-          <Input
-            placeholder='Age'
-            disabled={!isEditMode}
-            // value={value}
-            // onChangeText={(nextValue) => setValue(nextValue)}
-          />
+
           <Input
             placeholder='Lama Bekerja'
             disabled={!isEditMode}
+            value={String(data.lamaBekerja)}
+            onChangeText={(value) => {
+              updateData("lamaBekerja", value);
+            }}
             // value={value}
             // onChangeText={(nextValue) => setValue(nextValue)}
           />
           <Input
             placeholder='Jenis Kelamin'
             disabled={!isEditMode}
+            value={data.jenisKelamin}
+            onChangeText={(value) => {
+              updateData("jenisKelamin", value);
+            }}
             // value={value}
             // onChangeText={(nextValue) => setValue(nextValue)}
           />
           <Input
             placeholder='Jenjang Pendidikan'
             disabled={!isEditMode}
+            value={data.jenjangPendidikan}
+            onChangeText={(value) => {
+              updateData("jenjangPendidikan", value);
+            }}
             // value={value}
             // onChangeText={(nextValue) => setValue(nextValue)}
           />
           <Input
-            placeholder='Umur'
+            placeholder='Age'
             disabled={!isEditMode}
+            value={String(data.age)}
+            onChangeText={(value) => {
+              updateData("age", value);
+            }}
             // value={value}
             // onChangeText={(nextValue) => setValue(nextValue)}
           />
@@ -118,7 +201,7 @@ export default function Profile() {
               </Button>
               <Button
                 size='medium'
-                onPress={() => console.log("caksas")}
+                onPress={() => onSubmit()}
               >
                 SAVE
               </Button>

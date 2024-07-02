@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "150177522534",
+    "project_id": "jobstreet-clone-app",
+    "storage_bucket": "jobstreet-clone-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150177522534:android:53c8ddfa37524c60e39ea7",
+        "android_client_info": {
+          "package_name": "com.jobsclone.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjmKVjyiAA3RtqCC37opPUtqYOLdMg5Ms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
